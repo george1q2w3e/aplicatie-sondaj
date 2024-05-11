@@ -1,0 +1,161 @@
+---
+import Loading from "../../components/static/Loading.astro";
+import MyLayout from "../../layouts/Layout.astro";
+
+const response = await fetch("http://localhost:4321/api/survey/get/");
+const data = await response.json();
+
+interface Question {
+    question_id: string;
+    name: string;
+    optional: boolean;
+    type: string;
+    options: string[];
+    answers: string[];
+}
+
+// iterate over the data to get a list of objects
+const surveys = data.map(
+    (survey: {
+        survey_id: string;
+        survey_name: string;
+        description: string;
+        question_list: Question[];
+    }) => {
+        return {
+            id: survey.survey_id,
+            name: survey.survey_name,
+            description: survey.description,
+            questions: survey.question_list.map(
+                (question: {
+                    question_id: string;
+                    name: string;
+                    optional: boolean;
+                    type: string;
+                    options: string[];
+                    answers: string[];
+                }) => ({
+                    // Process questions
+                    question_id: question.question_id,
+                    name: question.name,
+                    optional: question.optional,
+                    type: question.type,
+                    options: question.options,
+                    answers: question.answers,
+                })
+            ),
+        };
+    }
+);
+
+const { slug } = Astro.params;
+const survey = surveys.find(
+    (survey: { id: string | undefined }) => survey.id === slug
+);
+if (!survey) return Astro.redirect("/404");
+
+const { name, description, questions } = survey;
+---
+
+<MyLayout title={name}>
+    <Loading />
+    <div class="center_element">
+        <div>
+            <div>
+                <h1>🗳️ {name}</h1>
+                <p class="description">{description}</p>
+            </div>
+            <hr class="mx-[-50px]" />
+            <ul class="my-7">
+                {
+                    questions.map(
+                        (question: {
+                            question_id: string;
+                            name: string;
+                            optional: boolean;
+                            type: string;
+                            options: string[];
+                            answers: string[];
+                        }) => (
+                            <li class="question">
+                                <div class="flex gap-2">
+                                    <h4 class="m-0" id={question.question_id}>
+                                        {question.name}
+                                    </h4>
+                                    <p class="m-0 optional">
+                                        {question.optional ? "" : "*"}
+                                    </p>
+                                </div>
+                                <hr />
+                                <form>
+                                    {question.type === "radio" && (
+                                        <fieldset>
+                                            {question.options?.map((option) => (
+                                                <div class="radio-buttons">
+                                                    <input
+                                                        required
+                                                        name={question.name}
+                                                        type="radio"
+                                                        value={option}
+                                                    />
+                                                    <label>{option}</label>
+                                                </div>
+                                            ))}
+                                        </fieldset>
+                                    )}
+                                    {question.type === "freeform" && (
+                                        <textarea
+                                            class="text_box"
+                                            placeholder="Scrie aici."
+                                            name={question.name}
+                                            rows="4"
+                                            cols="78"
+                                            style="resize: none;"
+                                        />
+                                    )}
+                                </form>
+                            </li>
+                        )
+                    )
+                }
+            </ul>
+            <button class="send">Trimite</button>
+        </div>
+    </div>
+</MyLayout>
+
+<script is:inline lang="ts">
+    document.querySelector(".loading").style.display = "none";
+
+    document.querySelector(".send").addEventListener("click", () => {
+        document.querySelector(".loading").style.display = "flex";
+        // Create an array of question-response pairs
+        const questionResponsePairs = Array.from(
+            document.querySelectorAll("li")
+        ).map((li) => ({
+            question_id: li.querySelector("h4")?.id,
+            answer:
+                li.querySelector("input:checked")?.value ||
+                li.querySelector("textarea")?.value,
+        }));
+
+        const url = "/api/questions/respond/";
+
+        fetch(url, {
+            method: "PUT",
+            body: JSON.stringify(questionResponsePairs),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    window.location.href = "/thanks";
+                } else {
+                    alert("Nu ai completat toate câmpurile obligatorii!");
+                    document.querySelector(".loading").style.display = "none";
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error, questionResponsePairs);
+                document.querySelector(".loading").style.display = "none";
+            });
+    });
+</script>

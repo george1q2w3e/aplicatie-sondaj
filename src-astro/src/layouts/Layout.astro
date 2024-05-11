@@ -1,0 +1,20 @@
+---
+const { title } = Astro.props;
+import "../styles/global.css";
+import Login from "../components/Login.svelte";
+
+// Acess locals
+const authorised: boolean = Astro.locals.authorized;
+---
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/x-icon" href="/favicon.png" />
+        <title>{title}</title>
+    </head>
+    <body>
+        <Login authorised={authorised}/>
+        <slot />
+    </body>
+</html>

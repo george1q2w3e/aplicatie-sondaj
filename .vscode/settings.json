@@ -1,0 +1,7 @@
+{
+    "rust-analyzer.linkedProjects": [
+        ".\\src-rust\\Cargo.toml",
+    ],
+    "rust-analyzer.showUnlinkedFileNotification": false,
+    "todo-tree.tree.showBadges": false
+}

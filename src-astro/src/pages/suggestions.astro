@@ -1,0 +1,115 @@
+---
+import Loading from "../components/static/Loading.astro";
+import MyLayout from "../layouts/Layout.astro";
+
+const response = await fetch("http://localhost:4321/api/suggestion/get/");
+const suggestions = await response.json();
+---
+
+<MyLayout>
+    <Loading />
+    <div class="center_element">
+        <div>
+            <h1>Sugestii Sondaje</h1>
+            <hr class="mx-[-50px]" />
+            <ul>
+                {
+                    suggestions?.map(
+                        (suggestion: {
+                            id: string;
+                            name: string;
+                            description: string;
+                        }) => (
+                            <li class="py-4" id={suggestion.id}>
+                                <h3>{suggestion.name}</h3>
+                                <p>{suggestion.description}</p>
+                                <div class="interact">
+                                    <button class="create-suggestion">
+                                        Crează Sondaj
+                                    </button>
+                                    <button class="remove-suggestion">
+                                        Refuză
+                                    </button>
+                                </div>
+                            </li>
+                        )
+                    )
+                }
+            </ul>
+        </div>
+    </div>
+</MyLayout>
+
+<script is:inline lang="ts">
+    document.querySelector(".loading").style.display = "none";
+
+    const create_suggesion_buttons =
+        document.querySelectorAll(".create-suggestion");
+
+    // Add the event listener to REMOVE SUGGESTION
+    create_suggesion_buttons.forEach(async function (button) {
+        button.addEventListener("click", (event) => {
+            const button = event.target.closest("button");
+            if (button) {
+                const suggestion_name =
+                    button.parentElement.parentElement.querySelector(
+                        "h3"
+                    ).innerText;
+                const suggestion_description =
+                    button.parentElement.parentElement.querySelector(
+                        "p"
+                    ).innerText;
+                const id = button.parentElement.parentElement.id;
+
+                // Send the data to the API
+                const json = {
+                    name: suggestion_name,
+                    description: suggestion_description,
+                };
+
+                fetch("http://localhost:4321/api/survey/make/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(json),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        fetch(`http://localhost:4321/api/suggestion/${id}`, {
+                            method: "DELETE",
+                        })
+                            // make an empty then to wait for the previous fetch to finish and send the user to the edit page
+                            .then(() => {
+                                window.location.href = `/survey/edit/${data}`;
+                            });
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                    });
+            }
+        });
+    });
+
+    const remove_suggesion_buttons =
+        document.querySelectorAll(".remove-suggestion");
+
+    // Add the event listener to REMOVE SUGGESTION
+    remove_suggesion_buttons.forEach(async function (button) {
+        button.addEventListener("click", (event) => {
+            document.querySelector(".loading").style.display = "flex";
+
+            const button = event.target.closest("button");
+            if (button) {
+                const id = button.parentElement.parentElement.id;
+                fetch(`http://localhost:4321/api/suggestion/${id}`, {
+                    method: "DELETE",
+                }).then(() => {
+                    // Instead of reloading the page, we remove the element from the DOM
+                    button.parentElement.parentElement.remove();
+                    document.querySelector(".loading").style.display = "none";
+                });
+            }
+        });
+    });
+</script>

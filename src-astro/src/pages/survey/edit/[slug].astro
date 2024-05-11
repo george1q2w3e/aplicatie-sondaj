@@ -1,0 +1,331 @@
+---
+import MyLayout from "../../../layouts/Layout.astro";
+
+const response = await fetch("http://localhost:4321/api/survey/get/");
+const data = await response.json();
+
+// iterate over the data to get a list of objects
+const surveys = data.map(
+    (survey: {
+        survey_id: string;
+        survey_name: string;
+        description: string;
+        question_list: any;
+    }) => {
+        return {
+            id: survey.survey_id,
+            name: survey.survey_name,
+            description: survey.description,
+            questions: survey.question_list.map(
+                (question: {
+                    question_id: any;
+                    name: any;
+                    optional: any;
+                    type: any;
+                    options: any;
+                    answers: any;
+                }) => ({
+                    // Process questions
+                    question_id: question.question_id,
+                    name: question.name,
+                    optional: question.optional,
+                    type: question.type,
+                    options: question.options,
+                    answers: question.answers,
+                })
+            ),
+        };
+    }
+);
+
+const { slug } = Astro.params;
+const survey = surveys.find(
+    (survey: { id: string | undefined }) => survey.id === slug
+);
+if (!survey) return Astro.redirect("/404");
+const { id, name, description, questions } = survey;
+const title = "Edit: " + name;
+---
+
+<MyLayout title={title}>
+    <div class="center_element">
+        <div>
+            <div>
+                <h1>🗳️ {name}</h1>
+                <p class="description">{description}</p>
+            </div>
+            <hr class="mx-[-50px]" />
+            <ul class="pr-[40px] my-7">
+                {
+                    questions.map(
+                        (question: {
+                            question_id: any;
+                            name: any;
+                            optional: any;
+                            type: any;
+                            options: string[];
+                        }) => (
+                            <li class="question">
+                                <button
+                                    type="button"
+                                    class="icon close-icon remove_question"
+                                >
+                                    <img
+                                        src="/remove_box.svg"
+                                        alt="Remove Question"
+                                    />
+                                </button>
+                                <div class="flex gap-2">
+                                    <h4 class="m-0" id={question.question_id}>
+                                        {question.name}
+                                    </h4>
+                                    <p class="m-0 optional">
+                                        {question.optional ? "" : "*"}
+                                    </p>
+                                </div>
+                                <hr />
+                                <form>
+                                    {question.type === "radio" && (
+                                        <fieldset>
+                                            {question.options?.map((option) => (
+                                                <div class="radio-buttons">
+                                                    <input
+                                                        required
+                                                        name={question.name}
+                                                        type="radio"
+                                                        value={option}
+                                                    />
+                                                    <label>{option}</label>
+                                                </div>
+                                            ))}
+                                        </fieldset>
+                                    )}
+                                    {question.type === "freeform" && (
+                                        <p class="text-sm text-gray-500">
+                                            Răspuns liber
+                                        </p>
+                                    )}
+                                </form>
+                            </li>
+                        )
+                    )
+                }
+                <div class="option_interact">
+                    <div class="interact">
+                        <textarea
+                            class="input"
+                            placeholder="Întrebare"
+                            rows="1"
+                            cols="30"
+                            style="resize: none;"></textarea>
+                        <!-- Select question type -->
+                        <select
+                            class="input question_type"
+                            name="question_type"
+                            onchange="checkDiv()"
+                        >
+                            <option value="radio">Radio</option>
+                            <option value="freeform">Freeform</option>
+                        </select>
+                        <!-- Select optional -->
+                        <fieldset class="m-0">
+                            <div
+                                class="pl-2 gap-2 flex justify-center items-center"
+                            >
+                                <input
+                                    id="optional"
+                                    type="checkbox"
+                                    name="optional"
+                                />
+                                <label for="optional">Optional</label>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="options_div">
+                        <div class="interact">
+                            <textarea
+                                class="input"
+                                placeholder="Opțiune"
+                                rows="1"
+                                cols="30"
+                                style="resize: none;"></textarea>
+                            <button type="button" class="icon add_option">
+                                <img src="/add_box.svg" alt="Add option" />
+                            </button>
+                        </div>
+                    </div>
+                    <button id={id} type="button" class="add_question"
+                        >Adaugă</button
+                    >
+                </div>
+            </ul>
+        </div>
+    </div>
+    <script is:inline>
+        function checkDiv() {
+            const select = document.querySelector(".question_type");
+            const options_div = document.querySelector(".options_div");
+            if (select.value === "freeform") {
+                options_div.style.display = "none";
+            } else {
+                options_div.style.display = "block";
+            }
+        }
+        // Call the function on load
+        checkDiv();
+    </script>
+    <script>
+        // Check if freeform hide the options_div
+        // For each question constantly check if the type is freeform
+        const question_type_buttons =
+            document.querySelectorAll(".question_type");
+
+        question_type_buttons.forEach(function (button) {
+            button.addEventListener("change", (event) => {
+                // Get the value of the selected option
+                const select = event.target as HTMLSelectElement;
+            });
+        });
+
+        const remove_question_buttons =
+            document.querySelectorAll(".remove_question");
+
+        remove_question_buttons.forEach(function (button) {
+            button.addEventListener("click", (event) => {
+                const button = (event.target as HTMLElement).closest("button");
+                if (button) {
+                    // Do something with the parent element
+                    const div = button.parentNode as HTMLElement;
+                    const h4 = div.querySelector("h4") as HTMLElement;
+                    const id = h4.id;
+
+                    // Make a DELETE request to the server to remove the question
+                    const url = "http://localhost:4321/api/questions/" + id;
+
+                    fetch(url, {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    })
+                        .then((response) => {
+                            if (response.ok) {
+                                // Remove the li element from the DOM
+                                const question =
+                                    button.parentNode as HTMLElement;
+                                question.remove();
+                            } else {
+                                console.error("Error: ", response);
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error:", error);
+                        });
+                }
+            });
+        });
+
+        // Handle the remove_option button with a function
+        function removeOption(Event: Event) {
+            const button = (Event.target as HTMLElement).closest("button");
+            if (button) {
+                const div = button.parentNode as HTMLElement;
+                div.remove();
+            }
+        }
+
+        const add_option_buttons = document.querySelectorAll(".add_option");
+
+        add_option_buttons.forEach(function (button) {
+            button.addEventListener("click", (event) => {
+                const button = (event.target as HTMLElement).closest("button");
+                if (button) {
+                    const div = button.parentNode as HTMLElement;
+                    const option_interact = div.parentNode as HTMLElement;
+
+                    // Add another question input field
+                    const interact = document.createElement("div");
+                    interact.classList.add("interact");
+                    const textarea = document.createElement("textarea");
+                    textarea.classList.add("input");
+                    textarea.placeholder = "Opțiune";
+                    textarea.rows = 1;
+                    textarea.cols = 30;
+                    textarea.style.resize = "none";
+                    interact.appendChild(textarea);
+
+                    // Add the remove option button
+                    const remove_option = document.createElement("button");
+                    remove_option.type = "button";
+                    remove_option.classList.add("icon");
+                    remove_option.classList.add("remove_option");
+                    remove_option.onclick = (event: MouseEvent) =>
+                        removeOption(event);
+                    const img = document.createElement("img");
+                    img.src = "/remove_box.svg";
+                    img.alt = "Remove option";
+                    remove_option.appendChild(img);
+                    interact.appendChild(remove_option);
+
+                    option_interact.appendChild(interact);
+                }
+            });
+        });
+
+        // Handle the add_question button
+        const add_question_button = document.querySelector(".add_question");
+
+        add_question_button?.addEventListener("click", (event) => {
+            const button = (event.target as HTMLElement).closest("button");
+            if (button) {
+                const option_interact = button.parentNode as HTMLElement;
+                const question = option_interact.querySelector(
+                    "textarea"
+                ) as HTMLTextAreaElement;
+                const question_name = question.value;
+                const question_type = option_interact.querySelector(
+                    "select"
+                ) as HTMLSelectElement;
+                const question_optional = option_interact.querySelector(
+                    "input"
+                ) as HTMLInputElement;
+
+                // Get the options
+                const options = option_interact.querySelectorAll("textarea");
+                const options_array: string[] = [];
+                options.forEach((option, index) => {
+                    if (index !== 0) {
+                        options_array.push(option.value);
+                    }
+                });
+
+                // Make a POST request to the server to add the question
+                const url = "http://localhost:4321/api/questions/" + button.id;
+
+                fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        name: question_name,
+                        optional: question_optional.checked,
+                        type_: question_type.value,
+                        options_: options_array,
+                    }),
+                })
+                    .then((response) => {
+                        if (response.ok) {
+                            // Reload the page
+                            location.reload();
+                        } else {
+                            console.error("Error: ", response);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                    });
+            }
+        });
+    </script>
+</MyLayout>

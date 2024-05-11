@@ -1,0 +1,35 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "command": "pnpm dev",
+            "name": "Astro Website",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/src-astro"
+        },
+        {
+            "command": "pnpm dev",
+            "name": "Express API",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/src-api"
+        },
+        {
+            "command": "docker container start postgres",
+            "name": "Database",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Full Stack",
+            "configurations": ["Express API", "Astro Website", "Database"]
+        }
+    ]
+}

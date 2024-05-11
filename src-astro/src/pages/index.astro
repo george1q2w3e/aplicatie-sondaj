@@ -1,0 +1,29 @@
+---
+import MyLayout from "../layouts/Layout.astro";
+import Loading from "../components/static/Loading.astro";
+import Surveys from "../components/Surveys.svelte";
+import Create from "../components/Create.svelte";
+
+// Get string from the API
+const response = await fetch("http://localhost:4321/api/survey/get/");
+const surveys = await response.json();
+
+// Acess locals
+const authorised: boolean = Astro.locals.authorized;
+---
+
+<MyLayout title="Aplicație sondaje">
+    <Loading />
+    <div class="center_element">
+        <div>
+            <h1>🗳️ Sondaje</h1>
+            <hr class="mx-[-50px]" />
+            <Create authorised={authorised} />
+            <Surveys authorised={authorised} surveys={surveys} />
+        </div>
+    </div>
+</MyLayout>
+<script is:inline lang="ts">
+    // Hide the loading screen
+    document.querySelector(".loading").style.display = "none";
+</script>

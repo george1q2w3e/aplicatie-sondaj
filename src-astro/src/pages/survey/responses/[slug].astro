@@ -1,0 +1,87 @@
+---
+import Chart from "../../../components/Chart.svelte";
+import MyLayout from "../../../layouts/Layout.astro";
+
+const response = await fetch("http://localhost:4321/api/survey/get/");
+const data = await response.json();
+
+// iterate over the data to get a list of objects
+const surveys = data ? data.map((survey: { survey_id: string; survey_name: string; description: string; question_list: any;}) => {
+  return {
+	id: survey.survey_id,
+	name: survey.survey_name,
+	description: survey.description,
+	questions: survey.question_list.map((question: { question_id: any; name: any; optional: any; type: any; options: any; answers: any; }) => ({ // Process questions
+        question_id: question.question_id,
+        name: question.name,
+        optional: question.optional,
+        type: question.type,
+        options: question.options,
+        answers: question.answers,
+	})),
+  };
+}) : [];
+
+const { slug } = Astro.params;
+
+const survey = surveys.find(
+    (survey: { id: string | undefined }) => survey.id === slug
+);
+if (!survey) return Astro.redirect("/404");
+
+const { name, description, questions } = survey;
+const title = "Responses: " + name;
+---
+
+<MyLayout title={title}>
+    <div class="center_element">
+        <div>
+            <div>
+                <h1>🗳️ {name}</h1>
+                <p class="description">{description}</p>
+            </div>
+            <hr class="mx-[-50px]" />
+            <ul class="pr-[40px] my-7">
+                {
+                    questions.map(
+                        (question: {
+                            question_id: string;
+                            name: string;
+                            type: string;
+                            answers: string[];
+                        }) => (
+                            <li class="question">
+                                {question.type === "radio" && (
+                                    <div class="flex gap-2">
+                                        <h4 class="m-0">
+                                            {question.name}
+                                        </h4>
+                                    </div>
+                                    <hr/>
+                                    <Chart answers={question.answers} givenId={question.question_id} client:visible/>
+                                )}
+                                {question.type === "freeform" && (
+                                    <div class="flex gap-2">
+                                        <h4 class="m-0">
+                                            {question.name}
+                                        </h4>
+                                    </div>
+                                    <hr/>
+                                    <div class="response_box">
+                                        <ul class="pl-8" style="list-style-type:disc !important;">
+                                            {
+                                                question.answers?.map((answer: string) => (
+                                                    <li>{answer}</li>
+                                                ))
+                                            }
+                                        </ul>
+                                    </div>
+                                )}
+                            </li>
+                        )
+                    )
+                }
+            </ul>
+        </div>
+    </div>
+</MyLayout>

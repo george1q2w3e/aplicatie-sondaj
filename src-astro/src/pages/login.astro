@@ -1,0 +1,88 @@
+---
+import MyLayout from "../layouts/Layout.astro";
+import Loading from "../components/static/Loading.astro";
+---
+
+<MyLayout title="Login">
+    <Loading />
+    <div class="center_element">
+        <div class="flex flex-col items-center">
+            <div class="pb-14">
+                <h1 class="pt-10">Autentificare</h1>
+                <div>
+                    <input
+                        class="auth_input input"
+                        placeholder="Utilizator"
+                        type="text"
+                        id="username"
+                        name="username"
+                    />
+                </div>
+                <div>
+                    <input
+                        class="auth_input input"
+                        placeholder="Parolă"
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                    />
+                </div>
+                <div class="interact">
+                    <button class="loign">Autentificare</button>
+                    <p class="pl-2 text-sm text-gray-500 underline">
+                        Ai uitat parola?
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</MyLayout>
+
+<script is:inline lang="ts">
+    // Hide the loading screen
+    document.querySelector(".loading").style.display = "none";
+
+    const button = document.querySelector(".loign");
+    button?.addEventListener("click", () => {
+        document.querySelector(".loading").style.display = "flex";
+
+        const user = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        const body = { user, password };
+
+        fetch("/api/login/", {
+            method: "POST",
+            body: JSON.stringify(body),
+        })
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error("Not OK!");
+                }
+
+                // Send to the home page
+                location.href = "/";
+            })
+            .catch((error) => {
+                console.warn("Fetch call failed");
+                console.error(error);
+            });
+    });
+
+    const clear_button = document.querySelector(".logout");
+    clear_button?.addEventListener("click", () => {
+        fetch("/api/logout/", { method: "POST" })
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error("Not OK!");
+                }
+                // Send to the home page
+                location.href = "/";
+            })
+            .catch((error) => {
+                console.warn("Fetch call failed");
+                console.error(error);
+            });
+    });
+</script>
