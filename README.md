@@ -46,7 +46,7 @@ winget install -e --id Docker.DockerDesktop
 
 Rulează Docker pentru a porni o bază de date PostgreSQL:
 ```powershell
-docker run -p 7878:5432 -d postgres:15.2 -e POSTGRES_PASSWORD=password --name postgres
+docker run --env=POSTGRES_PASSWORD=password -p 5432:5432 --restart=no --runtime=runc -d postgres
 ```
 
 ### Rularea aplicației:

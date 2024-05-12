@@ -5,7 +5,6 @@ import morgan from "morgan";
 import { surveyRoutes } from "./routes/survey_routes";
 import { suggestionRoutes } from "./routes/suggestion_routes";
 import { pool } from "./db";
-import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -30,7 +29,6 @@ app.use(function (_req, res, next) {
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cookieParser());
 app.use("/api/survey", surveyRoutes);
 app.use("/api/suggestion", suggestionRoutes);
 app.use(morgan("dev"));
