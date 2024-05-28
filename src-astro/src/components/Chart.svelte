@@ -2,10 +2,17 @@
     import { onMount } from "svelte";
     import Chart from "chart.js/auto";
 
-    // import the Astro Prop "givenId"
-    const { answers, givenId } = $$props;
+    const { answers, group, givenId } = $$props;
 
-    export let dataArray = answers;
+    export let dataArray;
+
+    if (!group) {
+        dataArray = answers.map((obj) => obj.answer);
+    } else {
+        dataArray = answers
+            .filter((obj) => obj.group === group)
+            .map((obj) => obj.answer);
+    }
 
     let elementCounts;
     let chartData;
@@ -66,6 +73,7 @@
             type: "pie",
             data: chartData,
             options: {
+                responsive: true,
                 plugins: {
                     tooltip: {
                         callbacks: {
@@ -83,11 +91,11 @@
 
 </script>
 
-{#if answers == null}
+{#if dataArray == ""}
     <br>
 {/if}
-{#if answers}
-    <div class="chart-container" style="position: relative; height:40vh;">
+{#if dataArray != ""}
+    <div class="chart-container" style="position: relative; height:40vh; width: 40vh;">
         <canvas id={givenId}></canvas>
     </div>
 {/if}

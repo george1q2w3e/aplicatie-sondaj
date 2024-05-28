@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { PoolClient } from "pg";
 import {
     CreateSurvey,
@@ -12,7 +12,7 @@ export async function get_survey_list(client: any, res: Response) {
     FROM (
         SELECT s.id AS survey_id, s.name AS survey_name, s.description,
             CASE WHEN count(q.id) = 0 THEN '[]' ELSE  json_agg(json_build_object('question_id', q.id, 'date_created', q.date_created, 'name', q.name, 'optional', q.optional,
-                'type', q.type_, 'options', q.options_, 'answers', q.answers ) ORDER BY q.date_created) END AS question_list
+                'type', q.type_, 'options', q.options_, 'answers', (SELECT json_agg(json_build_object('group', sr.respondant_group, 'answer', sr.answer)) FROM survey_responses sr WHERE sr.question_id = q.id))) END AS question_list
         FROM surveys s
         LEFT JOIN questions q ON q.survey_id = s.id
         GROUP BY s.id, survey_name, s.description
@@ -119,15 +119,15 @@ export async function delete_question(client: any, question_id: string) {
 export async function submit_response(
     client: any,
     question_id: string,
-    response: string
+    response: string,
+    group: string
 ) {
     // Prepare the statement for the response
     const responseStatement = `
-    UPDATE questions
-    SET answers = array_append(answers, $1)
-    WHERE id = $2;
+    INSERT INTO survey_responses(question_id, answer, respondant_group)
+    VALUES ($1, $2, $3);
     `;
-    const responseValues = [response, question_id];
+    const responseValues = [question_id, response, group];
 
     // Execute the statement and get the question id
     await client.query(responseStatement, responseValues);
@@ -141,6 +141,10 @@ export async function submit_responses(client : PoolClient, data: SurveyResponse
             response.question_id,
         ]);
 
+        if (response.group === "-") {
+            res.status(400).send("Respondant group must not be empty.");
+            return;
+        }
         // Verify if the response is empty
         if (response.answer === undefined && question[0].optional === false) {
             res.status(400).send("Question " + response.question_id + " is not optional");
@@ -164,7 +168,13 @@ export async function submit_responses(client : PoolClient, data: SurveyResponse
     }
     // Submit responses
     for (const response of data) {
-        await submit_response(client, response.question_id, response.answer);
+        try {
+            await submit_response(client, response.question_id, response.answer, response.group);
+        } catch (e) {
+            console.log(e);
+            res.status(400).send("Error submitting response: " + e);
+            return;
+        }
     }
     res.status(200).send("Responses added");
 }
@@ -177,8 +187,8 @@ export async function get_response(
     // Retrieve all the responses of a question
     const responseStatement = `
     SELECT answers
-    FROM questions
-    WHERE id = $1
+    FROM survey_responses
+    WHERE question_id = $1
     `;
     const responseValues = [question_id];
 

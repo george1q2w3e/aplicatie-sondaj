@@ -11,6 +11,7 @@ export interface AddQuestion {
 }
 
 export interface SurveyResponse {
+    group: string;
     question_id: string;
     answer: string;
 }

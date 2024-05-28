@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import morgan from "morgan";
 import { surveyRoutes } from "./routes/survey_routes";
 import { suggestionRoutes } from "./routes/suggestion_routes";
-import { pool } from "./db";
+import { pool, init } from "./db";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -47,28 +47,12 @@ app.listen(3050, async () => {
         // await client.query('DROP TABLE IF EXISTS questions cascade');
         // await client.query('DROP TABLE IF EXISTS surveys cascade');
         // await client.query('DROP TABLE IF EXISTS suggestions cascade');
+        // await client.query('DROP TABLE IF EXISTS survey_responses cascade');
 
-        await client.query(`CREATE TABLE IF NOT EXISTS surveys (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            name VARCHAR(255),
-            description VARCHAR(255)
-        );`);
-        await client.query(`CREATE TABLE IF NOT EXISTS questions (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            name VARCHAR(255),
-            survey_id UUID,
-            date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            optional BOOLEAN,
-            type_ VARCHAR(255),
-            options_ VARCHAR(255)[],
-            answers VARCHAR(255)[],
-            FOREIGN KEY (survey_id) REFERENCES surveys (id)
-        );`);
-        await client.query(`CREATE TABLE IF NOT EXISTS suggestions (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            name VARCHAR(255),
-            description VARCHAR(255)
-        );`);
+        // Wait 4 seconds to clear it
+        // await new Promise((resolve) => setTimeout(resolve, 4000));
+
+        await init(client);
     } catch (err) {
         console.error(err);
     } finally {

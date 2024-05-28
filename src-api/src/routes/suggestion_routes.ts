@@ -10,7 +10,7 @@ import {
 export const suggestionRoutes = Router();
 
 // GET /suggest — get_suggestions
-suggestionRoutes.get("/", async (res: Response) => {
+suggestionRoutes.get("/", async (req: Request, res: Response) => {
     const client = await pool.connect();
 
     try {

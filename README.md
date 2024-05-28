@@ -30,23 +30,22 @@ Această aplicație web full-stack permite utilizatorilor să creeze, gestioneze
 
 ### Instalare pe Windows:
 
-Instalează Node.js:
-```powershell
-winget install -e --id OpenJS.NodeJS
-```
+Instalează Node.js, recomand să foloești [NVM](https://github.com/coreybutler/nvm-windows).
 
 Instalează pnpm:
 ```powershell
 iwr https://get.pnpm.io/install.ps1 -useb | iex
 ```
-Instalează Docker Desktop:
-```powershell
-winget install -e --id Docker.DockerDesktop
-```
+Instalează [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 Rulează Docker pentru a porni o bază de date PostgreSQL:
 ```powershell
-docker run --env=POSTGRES_PASSWORD=password -p 5432:5432 --restart=no --runtime=runc -d postgres
+docker run --env=POSTGRES_PASSWORD=password -p 5432:5432 --restart=no --runtime=runc --name postgres -d postgres
+```
+
+Instalează pachetele necesare:
+```
+pnpm install
 ```
 
 ### Rularea aplicației:
