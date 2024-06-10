@@ -1,5 +1,6 @@
 ---
 import Chart from "../../../components/Chart.svelte";
+import List from "../../../components/List.svelte";
 import MyLayout from "../../../layouts/Layout.astro";
 
 const response = await fetch("http://localhost:4321/api/survey/get/");
@@ -17,7 +18,7 @@ const surveys = data ? data.map((survey: { survey_id: string; survey_name: strin
         optional: question.optional,
         type: question.type,
         options: question.options,
-        answers: question.answers,
+        answers: question.answers
 	})),
   };
 }) : [];
@@ -31,6 +32,8 @@ if (!survey) return Astro.redirect("/404");
 
 const { name, description, questions } = survey;
 const title = "Responses: " + name;
+const group_link = slug + "?group=";
+const group = Astro.request.url.split("?")[1]?.split("=")[1] || "";
 ---
 
 <MyLayout title={title}>
@@ -41,6 +44,15 @@ const title = "Responses: " + name;
                 <p class="description">{description}</p>
             </div>
             <hr class="mx-[-50px]" />
+            <p class="text-sm">Selectează grupul de respondenți:</p>
+            <div class="flex gap-2">
+                <a href={slug}><button class={`age_group ${group === '' ? 'selected_group' : ''}`}>Toți</button></a>
+                <a href={group_link + "elev"}><button class={`age_group ${group === 'elev' ? 'selected_group' : ''}`}>Elev</button></a>
+                <a href={group_link + "student"}><button class={`age_group ${group === 'student' ? 'selected_group' : ''}`}>Student</button></a>
+                <a href={group_link + "angajat"}><button class={`age_group ${group === 'angajat' ? 'selected_group' : ''}`}>Angajat Privat</button></a>
+                <a href={group_link + "bugetar"}><button class={`age_group ${group === 'bugetar' ? 'selected_group' : ''}`}>Angajat Stat</button></a>
+                <a href={group_link + "pensionar"}><button class={`age_group ${group === 'pensionar' ? 'selected_group' : ''}`}>Pensionar </button></a>
+            </div>
             <ul class="pr-[40px] my-7">
                 {
                     questions.map(
@@ -58,7 +70,7 @@ const title = "Responses: " + name;
                                         </h4>
                                     </div>
                                     <hr/>
-                                    <Chart answers={question.answers} givenId={question.question_id} client:visible/>
+                                    <Chart answers={question.answers} group={group} givenId={question.question_id} client:visible/>
                                 )}
                                 {question.type === "freeform" && (
                                     <div class="flex gap-2">
@@ -67,15 +79,7 @@ const title = "Responses: " + name;
                                         </h4>
                                     </div>
                                     <hr/>
-                                    <div class="response_box">
-                                        <ul class="pl-8" style="list-style-type:disc !important;">
-                                            {
-                                                question.answers?.map((answer: string) => (
-                                                    <li>{answer}</li>
-                                                ))
-                                            }
-                                        </ul>
-                                    </div>
+                                    <List answers={question.answers} group={group}client:visible/>
                                 )}
                             </li>
                         )

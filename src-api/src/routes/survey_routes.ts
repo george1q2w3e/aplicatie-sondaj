@@ -112,7 +112,7 @@ surveyRoutes.put("/question/:id", async (req, res) => {
             res.status(400).send("Response must not be empty, optional is " + optional.rows[0].optional);
             return;
         }
-        await submit_response(client, question_id, response.answer);
+        await submit_response(client, question_id, response.answer, response.group);
         res.status(200).send("Question response added");
     } catch (err) {
         await client.query("ROLLBACK");

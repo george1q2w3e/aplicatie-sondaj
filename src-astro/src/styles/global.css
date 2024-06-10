@@ -244,6 +244,21 @@ button {
 button:hover {
     border: 2px solid #0e4291;
 }
+.age_group {
+    background-color: #6a7aab;
+    padding: 5px 20px;
+}
+.age_group:hover {
+    background-color: #7f8fbb;
+    border: 2px solid #61666c00;
+}
+.selected_group {
+    color: #fefefe;
+    border: 2px solid #44586f;
+}
+.selected_group:hover {
+    border: 2px solid #44586f;
+}
 
 li hr {
     margin-right: -2rem;

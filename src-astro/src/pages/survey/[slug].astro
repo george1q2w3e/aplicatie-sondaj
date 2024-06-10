@@ -66,6 +66,17 @@ const { name, description, questions } = survey;
                 <p class="description">{description}</p>
             </div>
             <hr class="mx-[-50px]" />
+            <p class="text-sm">Categorie:</p>
+            <select
+                name="age_group"
+            >
+                <option disabled selected="selected">-</option>
+                <option value="elev">Elev</option>
+                <option value="student">Student</option>
+                <option value="angajat">Angajat Privat</option>
+                <option value="bugetar">Angajat Stat</option>
+                <option value="pensionar">Pensionar</option>
+            </select>
             <ul class="my-7">
                 {
                     questions.map(
@@ -133,6 +144,7 @@ const { name, description, questions } = survey;
         const questionResponsePairs = Array.from(
             document.querySelectorAll("li")
         ).map((li) => ({
+            group: document.querySelector("select[name='age_group']")?.value,
             question_id: li.querySelector("h4")?.id,
             answer:
                 li.querySelector("input:checked")?.value ||

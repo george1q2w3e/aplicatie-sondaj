@@ -124,8 +124,8 @@ const title = "Edit: " + name;
                             name="question_type"
                             onchange="checkDiv()"
                         >
-                            <option value="radio">Radio</option>
-                            <option value="freeform">Freeform</option>
+                            <option value="radio">Opțiuni</option>
+                            <option value="freeform">Liber</option>
                         </select>
                         <!-- Select optional -->
                         <fieldset class="m-0">
@@ -267,7 +267,7 @@ const title = "Edit: " + name;
                     remove_option.appendChild(img);
                     interact.appendChild(remove_option);
 
-                    option_interact.appendChild(interact);
+                    option_interact.prepend(interact);
                 }
             });
         });
