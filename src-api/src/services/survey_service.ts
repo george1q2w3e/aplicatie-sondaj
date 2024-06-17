@@ -1,10 +1,6 @@
 import { Response } from "express";
 import { PoolClient } from "pg";
-import {
-    CreateSurvey,
-    AddQuestion,
-    SurveyResponse,
-} from "../models/survey";
+import { CreateSurvey, AddQuestion, SurveyResponse } from "../models/survey";
 
 export async function get_survey_list(client: any, res: Response) {
     const surveys = await client.query(`
@@ -133,13 +129,18 @@ export async function submit_response(
     await client.query(responseStatement, responseValues);
 }
 
-export async function submit_responses(client : PoolClient, data: SurveyResponse[], res: Response) {
+export async function submit_responses(
+    client: PoolClient,
+    data: SurveyResponse[],
+    res: Response
+) {
     // Validate responses on the server
     for (const response of data) {
         // Check if the question is optional
-        const { rows: question } = await client.query("SELECT * FROM questions WHERE id = $1", [
-            response.question_id,
-        ]);
+        const { rows: question } = await client.query(
+            "SELECT * FROM questions WHERE id = $1",
+            [response.question_id]
+        );
 
         if (response.group === "-") {
             res.status(400).send("Respondant group must not be empty.");
@@ -147,7 +148,9 @@ export async function submit_responses(client : PoolClient, data: SurveyResponse
         }
         // Verify if the response is empty
         if (response.answer === undefined && question[0].optional === false) {
-            res.status(400).send("Question " + response.question_id + " is not optional");
+            res.status(400).send(
+                "Question " + response.question_id + " is not optional"
+            );
             return;
         }
         if (response.answer === "" && question[0].optional === false) {
@@ -155,13 +158,27 @@ export async function submit_responses(client : PoolClient, data: SurveyResponse
             return;
         }
         // If response is freeform and optional remove the response from the data
-        if (question[0].type_ === "freeform" && question[0].optional === true && response.answer === "") {
+        if (
+            question[0].type_ === "freeform" &&
+            question[0].optional === true &&
+            response.answer === ""
+        ) {
             data.splice(data.indexOf(response), 1);
-        }
-        else {
+        } else {
             // Validate options only if the question has options
-            if ( question[0].type_ !== "freeform" && question[0].options_ !== null && !question[0].options_.includes(response.answer)) {
-                res.status(400).send("Invalid option for question " + response.question_id + "." + response.answer + " is not in " + question[0].options_);
+            if (
+                question[0].type_ !== "freeform" &&
+                question[0].options_ !== null &&
+                !question[0].options_.includes(response.answer)
+            ) {
+                res.status(400).send(
+                    "Invalid option for question " +
+                        response.question_id +
+                        "." +
+                        response.answer +
+                        " is not in " +
+                        question[0].options_
+                );
                 return;
             }
         }
@@ -169,7 +186,12 @@ export async function submit_responses(client : PoolClient, data: SurveyResponse
     // Submit responses
     for (const response of data) {
         try {
-            await submit_response(client, response.question_id, response.answer, response.group);
+            await submit_response(
+                client,
+                response.question_id,
+                response.answer,
+                response.group
+            );
         } catch (e) {
             console.log(e);
             res.status(400).send("Error submitting response: " + e);

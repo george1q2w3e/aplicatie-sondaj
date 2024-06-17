@@ -2,7 +2,7 @@
     // import the Astro Prop "authorised"
     const { authorised } = $$props;
 
-    const status = authorised ? "Logout" : "Login" as string;
+    const status = authorised ? "Logout" : ("Login" as string);
 </script>
 
 {#if authorised}

@@ -8,18 +8,13 @@ export const DELETE: APIRoute = async ({ params }) => {
         headers: {
             "Content-Type": "application/json",
         },
-    })
+    });
 
     if (!response.ok) {
-        return new Response(
-            JSON.stringify("Error deleting survey"),
-            { status: 500 }
-        );
+        return new Response(JSON.stringify("Error deleting survey"), {
+            status: 500,
+        });
     }
 
-    // Return ok and 200 and message
-    return new Response(
-        JSON.stringify("Survey deleted"),
-        { status: 200 }
-    );
+    return new Response(JSON.stringify("Survey deleted"), { status: 200 });
 };

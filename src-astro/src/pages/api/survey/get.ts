@@ -8,14 +8,8 @@ export const GET: APIRoute = async () => {
     if (!data) {
         const empty_array: string[] = [];
 
-        return new Response(
-            JSON.stringify(empty_array),
-            { status: 404 }
-        );
+        return new Response(JSON.stringify(empty_array), { status: 404 });
     }
 
-    return new Response(
-        JSON.stringify(data),
-        { status: 200 }
-    );
+    return new Response(JSON.stringify(data), { status: 200 });
 };

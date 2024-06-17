@@ -88,17 +88,16 @@
             },
         });
     });
-
 </script>
 
 {#if dataArray == ""}
-    <br>
+    <br />
 {/if}
 {#if dataArray != ""}
-    <div class="chart-container" style="position: relative; height:40vh; width: 40vh;">
+    <div
+        class="chart-container"
+        style="position: relative; height:40vh; width: 40vh;"
+    >
         <canvas id={givenId}></canvas>
     </div>
 {/if}
-
-
-

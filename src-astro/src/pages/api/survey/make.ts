@@ -9,11 +9,8 @@ export const POST: APIRoute = async ({ request }) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
-    })
+    });
     const data = await response.json();
 
-    return new Response(
-        JSON.stringify(data),
-        { status: 200 }
-    );
+    return new Response(JSON.stringify(data), { status: 200 });
 };

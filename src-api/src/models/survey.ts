@@ -6,7 +6,7 @@ export interface CreateSurvey {
 export interface AddQuestion {
     name: string;
     optional: boolean;
-    type_ : string;
+    type_: string;
     options_: string[];
 }
 

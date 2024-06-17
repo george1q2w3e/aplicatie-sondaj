@@ -1,11 +1,11 @@
-import { Pool, PoolClient } from 'pg';
+import { Pool, PoolClient } from "pg";
 
 // Create a connection pool
 const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'postgres',
-    password: 'password',
+    user: "postgres",
+    host: "localhost",
+    database: "postgres",
+    password: "password",
     port: 5432,
 });
 

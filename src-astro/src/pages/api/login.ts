@@ -5,17 +5,20 @@ import { TOKEN } from "../../constants";
 // Add the secret key to the middleware from .env file
 const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET_KEY);
 
-export const POST: APIRoute = async ({request}) => {
+export const POST: APIRoute = async ({ request }) => {
     try {
         // Get the username and password from the request body
         const { user, password } = await request.json();
 
         // Check if the username and password are correct
         if (user !== "admin" || password !== "123") {
-            return new Response( JSON.stringify({ message: "Invalid credentials" }), {
-                status: 401,
-                headers: { "Content-Type": "application/json" },
-            });
+            return new Response(
+                JSON.stringify({ message: "Invalid credentials" }),
+                {
+                    status: 401,
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
         }
 
         // Generate a JWT token

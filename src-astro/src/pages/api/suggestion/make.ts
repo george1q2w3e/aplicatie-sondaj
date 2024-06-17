@@ -9,17 +9,13 @@ export const POST: APIRoute = async ({ request }) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
-    })
+    });
 
     if (!response.ok) {
-        return new Response(
-            JSON.stringify("Error adding response"),
-            { status: 500 }
-        );
+        return new Response(JSON.stringify("Error adding response"), {
+            status: 500,
+        });
     }
 
-    return new Response(
-        JSON.stringify("Response Added!"),
-        { status: 200 }
-    );
+    return new Response(JSON.stringify("Response Added!"), { status: 200 });
 };

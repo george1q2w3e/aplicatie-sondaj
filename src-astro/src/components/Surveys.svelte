@@ -2,22 +2,16 @@
     // Import the Astro Prop "givenId"
     const { surveys, authorised } = $$props;
     export let dataArray = surveys;
-    const status = authorised ? true : false as boolean;
-
+    const status = authorised ? true : (false as boolean);
 </script>
+
 <ul class="pt-5" style="list-style-type: none;">
     {#each dataArray as survey}
         <li class="question">
             {#if status}
-            <button
-                type="button"
-                class="icon close-icon remove_survey"
-            >
-                <img
-                    src="/remove_box.svg"
-                    alt="Remove Survey"
-                />
-            </button>
+                <button type="button" class="icon close-icon remove_survey">
+                    <img src="/remove_box.svg" alt="Remove Survey" />
+                </button>
             {/if}
             <h2 id={survey.survey_id}>
                 <a href={`/survey/${survey.survey_id}`}>
@@ -30,16 +24,10 @@
             {#if status}
                 <div class="flex gap-3">
                     <a href={`/survey/edit/${survey.survey_id}`}>
-                        <img
-                            src="/edit.svg"
-                            alt="Edit"
-                            class="edit-icon w-5"
-                        />
+                        <img src="/edit.svg" alt="Edit" class="edit-icon w-5" />
                     </a>
                     <p class="m-0 font-medium text-sm">
-                        <a
-                            href={`/survey/responses/${survey.survey_id}`}
-                        >
+                        <a href={`/survey/responses/${survey.survey_id}`}>
                             Vezi Rezultate
                         </a>
                     </p>
@@ -48,7 +36,8 @@
         </li>
     {/each}
     <script>
-        const remove_survey_buttons = document.querySelectorAll(".remove_survey");
+        const remove_survey_buttons =
+            document.querySelectorAll(".remove_survey");
         remove_survey_buttons.forEach(async function (button) {
             button.addEventListener("click", (event) => {
                 const button = event.target.closest("button");
