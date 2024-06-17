@@ -61,7 +61,7 @@ export async function create_survey(
 
 export async function delete_survey(client: any, survey_id: string) {
     // Prepare for deletion of the survey
-    const transaction = await client.query("BEGIN");
+    await client.query("BEGIN");
 
     // Prepare the statement for the questions
     const questionStatement = "DELETE FROM questions WHERE survey_id = $1";

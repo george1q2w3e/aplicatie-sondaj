@@ -71,7 +71,6 @@ surveyRoutes.post("/question/:id", async (req: Request, res: Response) => {
     const question = req.body as AddQuestion;
     const client = await pool.connect();
 
-    // Begin transaction
     await client.query("BEGIN");
 
     try {
@@ -150,7 +149,7 @@ surveyRoutes.delete("/:id", async (req: Request, res: Response) => {
         await client.query("ROLLBACK");
         res.status(500).send("Error deleting survey: " + err);
     } finally {
-        res.status(200).send("Survey deleted");
+        res.status(200).send("Question deleted");
         client.release();
     }
 });

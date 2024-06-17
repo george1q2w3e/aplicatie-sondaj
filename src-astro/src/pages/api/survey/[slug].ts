@@ -17,8 +17,9 @@ export const DELETE: APIRoute = async ({ params }) => {
         );
     }
 
+    // Return ok and 200 and message
     return new Response(
-        JSON.stringify("Deleted!"),
+        JSON.stringify("Survey deleted"),
         { status: 200 }
     );
 };

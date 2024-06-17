@@ -15,7 +15,7 @@
             >
                 <img
                     src="/remove_box.svg"
-                    alt="Remove Question"
+                    alt="Remove Survey"
                 />
             </button>
             {/if}
