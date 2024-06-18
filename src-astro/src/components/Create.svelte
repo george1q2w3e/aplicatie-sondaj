@@ -42,7 +42,11 @@
                     return;
                 }
                 if (name.length > 100) {
-                    alert("Name is too long");
+                    alert("Numele este prea lung");
+                    return;
+                }
+                if (description.trim().length > 200) {
+                    alert("Descrierea este prea lungă");
                     return;
                 }
 
@@ -119,11 +123,15 @@
 
                 // Check if the name or description is empty
                 if (name === "" || description === "") {
-                    alert("Please fill in the name and description");
+                    alert("Te rog completează numele și descrierea");
                     return;
                 }
                 if (name.length > 100) {
-                    alert("Name is too long");
+                    alert("Numele este prea lung");
+                    return;
+                }
+                if (description.trim().length > 200) {
+                    alert("Descrierea este prea lungă");
                     return;
                 }
 
