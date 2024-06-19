@@ -194,13 +194,12 @@ const title = "Edit: " + name;
             button.addEventListener("click", (event) => {
                 const button = (event.target as HTMLElement).closest("button");
                 if (button) {
-                    // Do something with the parent element
                     const div = button.parentNode as HTMLElement;
                     const h4 = div.querySelector("h4") as HTMLElement;
                     const id = h4.id;
 
                     // Make a DELETE request to the server to remove the question
-                    const url = "http://localhost:4321/api/questions/" + id;
+                    const url = "/api/questions/" + id;
 
                     fetch(url, {
                         method: "DELETE",
@@ -211,9 +210,8 @@ const title = "Edit: " + name;
                         .then((response) => {
                             if (response.ok) {
                                 // Remove the li element from the DOM
-                                const question =
-                                    button.parentNode as HTMLElement;
-                                question.remove();
+                                const div = button.parentNode as HTMLElement;
+                                div.remove();
                             } else {
                                 console.error("Error: ", response);
                             }

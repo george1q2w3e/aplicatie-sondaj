@@ -11,7 +11,8 @@
             placeholder="Descriere"
             rows="4"
             cols="40"
-            style="resize: none;"></textarea>
+            style="resize: none;"
+        ></textarea>
     </div>
     <div class="interact">
         <textarea
@@ -19,60 +20,70 @@
             placeholder="Nume"
             rows="1"
             cols="40"
-            style="resize: none;"></textarea>
+            style="resize: none;"
+        ></textarea>
         <button type="button" class="create_survey">Crează</button>
         <p class="text-sm pl-2">
             <a href="/suggestions">Vezi Sugestii</a>
         </p>
     </div>
     <script>
-        document.querySelector(".create_survey").addEventListener("click", () => {
+        document
+            .querySelector(".create_survey")
+            .addEventListener("click", () => {
+                const name = document.querySelector(".survey_name").value;
+                const description = document.querySelector(
+                    ".survey_description"
+                ).value;
 
-            const name = document.querySelector(".survey_name").value;
-            const description = document.querySelector(".survey_description").value;
+                // Check if the name or description is empty
+                if (name === "" || description === "") {
+                    alert("Te rog completează numele și descrierea");
+                    return;
+                }
+                if (name.length > 100) {
+                    alert("Numele este prea lung");
+                    return;
+                }
+                if (description.trim().length > 200) {
+                    alert("Descrierea este prea lungă");
+                    return;
+                }
 
-            // Check if the name or description is empty
-            if (name === "" || description === "") {
-                alert("Te rog completează numele și descrierea");
-                return;
-            }
-            if (name.length > 100) {
-                alert("Name is too long");
-                return;
-            }
+                const body = {
+                    name: name,
+                    description: description,
+                };
 
-            const body = {
-                name: name,
-                description: description,
-            };
+                document.querySelector(".loading").style.display = "flex";
 
-            document.querySelector(".loading").style.display = "flex";
+                // Make a POST request to the server to create a new survey
+                const url = "http://localhost:4321/api/survey/make/";
 
-            // Make a POST request to the server to create a new survey
-            const url = "http://localhost:4321/api/survey/make/";
-
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    // Remove input from the textarea
-                    document.querySelector(".survey_name").value = "";
-                    document.querySelector(".survey_description").value = "";
-
-                    // Send the user to the edit page
-                    window.location.href = `/survey/edit/${data}`;
+                fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(body),
                 })
-                .catch((error) => {
-                    // Hide the loading screen
-                    document.querySelector(".loading").style.display = "none";
-                    console.error("Error:", error);
-                });
-        });
+                    .then((response) => response.json())
+                    .then((data) => {
+                        // Remove input from the textarea
+                        document.querySelector(".survey_name").value = "";
+                        document.querySelector(".survey_description").value =
+                            "";
+
+                        // Send the user to the edit page
+                        window.location.href = `/survey/edit/${data}`;
+                    })
+                    .catch((error) => {
+                        // Hide the loading screen
+                        document.querySelector(".loading").style.display =
+                            "none";
+                        console.error("Error:", error);
+                    });
+            });
     </script>
 {/if}
 {#if !authorised}
@@ -83,7 +94,8 @@
             placeholder="Descriere"
             rows="4"
             cols="40"
-            style="resize: none;"></textarea>
+            style="resize: none;"
+        ></textarea>
     </div>
     <div class="interact">
         <textarea
@@ -91,57 +103,65 @@
             placeholder="Nume"
             rows="1"
             cols="40"
-            style="resize: none;"></textarea>
-        <button type="button" class="create_suggestion_survey"
-            >Sugerează</button
+            style="resize: none;"
+        ></textarea>
+        <button type="button" class="create_suggestion_survey">Sugerează</button
         >
     </div>
     <script>
-        document.querySelector(".create_suggestion_survey").addEventListener("click", () => {
-            document.querySelector(".loading").style.display = "flex";
+        document
+            .querySelector(".create_suggestion_survey")
+            .addEventListener("click", () => {
+                document.querySelector(".loading").style.display = "flex";
 
-            const name = document.querySelector(
-                ".suggestion_survey_name"
-            ).value;
-            const description = document.querySelector(
-                ".suggestion_survey_description"
-            ).value;
+                const name = document.querySelector(
+                    ".suggestion_survey_name"
+                ).value;
+                const description = document.querySelector(
+                    ".suggestion_survey_description"
+                ).value;
 
-            // Check if the name or description is empty
-            if (name === "" || description === "") {
-                alert("Please fill in the name and description");
-                return;
-            }
-            if (name.length > 100) {
-                alert("Name is too long");
-                return;
-            }
+                // Check if the name or description is empty
+                if (name === "" || description === "") {
+                    alert("Te rog completează numele și descrierea");
+                    return;
+                }
+                if (name.length > 100) {
+                    alert("Numele este prea lung");
+                    return;
+                }
+                if (description.trim().length > 200) {
+                    alert("Descrierea este prea lungă");
+                    return;
+                }
 
-            const json = {
-                name: name,
-                description: description,
-            };
+                const json = {
+                    name: name,
+                    description: description,
+                };
 
-            const url = "/api/suggestion/make/";
+                const url = "/api/suggestion/make/";
 
-            fetch(url, {
-                method: "POST",
-                body: JSON.stringify(json),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    // Remove input from the textarea
-                    document.querySelector(".suggestion_survey_name").value =
-                        "";
-                    document.querySelector(
-                        ".suggestion_survey_description"
-                    ).value = "";
-                    document.querySelector(".loading").style.display = "none";
+                fetch(url, {
+                    method: "POST",
+                    body: JSON.stringify(json),
                 })
-                .catch((error) => {
-                    console.error("Error:", error);
-                });
-        });
+                    .then((response) => response.json())
+                    .then((data) => {
+                        // Remove input from the textarea
+                        document.querySelector(
+                            ".suggestion_survey_name"
+                        ).value = "";
+                        document.querySelector(
+                            ".suggestion_survey_description"
+                        ).value = "";
+                        document.querySelector(".loading").style.display =
+                            "none";
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                    });
+            });
     </script>
 {/if}
-    <hr class="mx-[-50px]" />
+<hr class="mx-[-50px]" />

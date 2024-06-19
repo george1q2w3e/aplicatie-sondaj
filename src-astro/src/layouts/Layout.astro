@@ -14,7 +14,7 @@ const authorised: boolean = Astro.locals.authorized;
         <title>{title}</title>
     </head>
     <body>
-        <Login authorised={authorised}/>
+        <Login authorised={authorised} />
         <slot />
     </body>
 </html>

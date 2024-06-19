@@ -12,11 +12,7 @@ import {
     delete_question,
     get_response,
 } from "../services/survey_service";
-import {
-    CreateSurvey,
-    AddQuestion,
-    SurveyResponse,
-} from "../models/survey";
+import { CreateSurvey, AddQuestion, SurveyResponse } from "../models/survey";
 import { PoolClient } from "pg";
 
 export const surveyRoutes = Router();
@@ -71,12 +67,14 @@ surveyRoutes.post("/question/:id", async (req: Request, res: Response) => {
     const question = req.body as AddQuestion;
     const client = await pool.connect();
 
-    // Begin transaction
     await client.query("BEGIN");
 
     try {
         // Check if the survey exists
-        const { rowCount } = await client.query("SELECT 1 FROM surveys WHERE id = $1", [survey_id]);
+        const { rowCount } = await client.query(
+            "SELECT 1 FROM surveys WHERE id = $1",
+            [survey_id]
+        );
         if (rowCount === 0) {
             res.status(404).send(`Survey with ID ${survey_id} not found`);
             return;
@@ -105,14 +103,25 @@ surveyRoutes.put("/question/:id", async (req, res) => {
             [question_id]
         );
         if (response.answer === undefined) {
-            res.status(400).send("Response must have an answer, optional is " + optional.rows[0].optional);
+            res.status(400).send(
+                "Response must have an answer, optional is " +
+                    optional.rows[0].optional
+            );
             return;
         }
         if (response.answer === "") {
-            res.status(400).send("Response must not be empty, optional is " + optional.rows[0].optional);
+            res.status(400).send(
+                "Response must not be empty, optional is " +
+                    optional.rows[0].optional
+            );
             return;
         }
-        await submit_response(client, question_id, response.answer, response.group);
+        await submit_response(
+            client,
+            question_id,
+            response.answer,
+            response.group
+        );
         res.status(200).send("Question response added");
     } catch (err) {
         await client.query("ROLLBACK");
@@ -150,7 +159,7 @@ surveyRoutes.delete("/:id", async (req: Request, res: Response) => {
         await client.query("ROLLBACK");
         res.status(500).send("Error deleting survey: " + err);
     } finally {
-        res.status(200).send("Survey deleted");
+        res.status(200).send("Question deleted");
         client.release();
     }
 });

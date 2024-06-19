@@ -3,9 +3,9 @@ import { TOKEN } from "../../constants";
 
 export const POST: APIRoute = async () => {
     try {
-		// clearCookie
-		const headers = new Headers();
-		headers.append("set-cookie", `${TOKEN}=; path=/; Max-Age=0`);
+        // clearCookie
+        const headers = new Headers();
+        headers.append("set-cookie", `${TOKEN}=; path=/; Max-Age=0`);
 
         // Return a success response
         return new Response(
@@ -14,7 +14,7 @@ export const POST: APIRoute = async () => {
             }),
             {
                 status: 200,
-				headers, // Use the custom headers
+                headers, // Use the custom headers
             }
         );
     } catch (error) {
